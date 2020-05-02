@@ -225,9 +225,9 @@ void * FakeSource::stream_generator(void * arg) {
 					int data_len = info->writer->Write((char *)pFrameRGB->data[0], pFrameRGB->linesize[0], (int) info->streamer->GetQualityFactor());
 
 					//printf("data len is %d \n", data_len);
-					int w, h, offset;
-					JPEG_Writer::GetInfo(info->writer->GetBuffer(), data_len, w, h, offset);
-					assert(w == pCodecCtx->width && h == pCodecCtx->height);
+					//int w, h, offset;
+					//JPEG_Writer::GetInfo(info->writer->GetBuffer(), data_len, w, h, offset);
+					//assert(w == pCodecCtx->width && h == pCodecCtx->height);
 
 					char * p = info->writer->GetBuffer();
 					info->streamer->StreamImage(info->writer->GetBuffer(), data_len, pCodecCtx->width, pCodecCtx->height);
