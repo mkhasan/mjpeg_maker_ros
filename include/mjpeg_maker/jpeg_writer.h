@@ -9,8 +9,10 @@
 #define SRC_JPEG_WRITER_H_
 
 
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <memory>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +27,12 @@ extern "C" {
 
 #include "image_writer.h"
 
+
+namespace Magick {
+class Blob;
+}
 namespace mjpeg_maker {
+
 
 class JPEG_Writer : public ImageWriter {
 
@@ -39,19 +46,21 @@ class JPEG_Writer : public ImageWriter {
 	int write_JPEG_file(unsigned char * dest, unsigned char * src, int stride, int quality);
 
 
+	std::unique_ptr<Magick::Blob> jpegBlob;
+
 
 public:
 
-	JPEG_Writer(int image_width, int image_height);
+	JPEG_Writer(int image_width, int image_height, int channel=3, int downSamplingFactor = 1);
 	~JPEG_Writer();
 
 	void Initialize(int image_width, int image_height);
 	void Finalize();
 
 	//void Write(char * dest, AVFrame * src, int quality);
-	int Write(char * dest, char * src, int stride, int quality);
+	int Write(char * dest, char * src, int srcLen, int stride, int quality);
 
-	static void GetInfo(char * data, int data_len, int & width, int & height, int & payloadIndex);
+
 };
 
 }

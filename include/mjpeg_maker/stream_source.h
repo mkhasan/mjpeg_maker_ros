@@ -26,6 +26,9 @@ public:
 	StreamSource(int width, int height, int streamID, CStreamer * streamer, ImageWriter * writer);
 	virtual ~StreamSource();
 	void SetStreamID(int streamID);
+	int GetStreamID() const;
+	CStreamer * GetStreamer() const;
+	ImageWriter * GetWriter() const;
 };
 
 }

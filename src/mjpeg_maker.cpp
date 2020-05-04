@@ -3,6 +3,11 @@
 
 #include "ace/Signal.h"
 #include "mjpeg_maker/client_acceptor.h"
+#include "mjpeg_maker/utils.h"
+#include "mjpeg_maker/shm_manager.h"
+
+#include "ros/ros.h"
+#include <string>
 
 #define RTSP_PORT 8554
 
@@ -22,26 +27,32 @@ static const u_short PORT = RTSP_PORT;//ACE_DEFAULT_SERVER_PORT;
 
 namespace mjpeg_maker {
 
-ACE_Reactor *reactor;
+std::unique_ptr<ACE_Reactor> reactor;
+//ACE_Reactor *reactor;
 
-void Finish() {
+void finish() {
 
 	reactor->close();
 	quit=1;
 }
 
-void * main1 (void *)
+void * mjpeg_maker_func (void * arg)
 {
 
    printf("url=rtsp://127.0.0.1:%d/mjpeg/1\n", PORT);
 
 
+   std::string * mutexPrefix = (std::string *) arg;
+   ROS_DEBUG("mjpeg_maker_func: mutex prefix is %s", mutexPrefix->c_str());
+
+   auto shmManager = ServiceContainer::Instance()->get<ShmManager>();
+   shmManager->Initialize(*mutexPrefix);
    //ACE_Reactor reactor;
-   reactor = new ACE_Reactor();
+   reactor = std::make_unique<ACE_Reactor>();
    Client_Acceptor peer_acceptor;
 
     if (peer_acceptor.open (ACE_INET_Addr (PORT),
-                          reactor) == -1) {
+                          reactor.get()) == -1) {
     	ACE_ERROR ((LM_ERROR,
                        "%p\n",
                        "open"));
@@ -65,6 +76,7 @@ void * main1 (void *)
   ACE_DEBUG ((LM_DEBUG,
               "(%P|%t) shutting down server daemon\n"));
 
+  shmManager->Finalize();
   return NULL;
 }
 

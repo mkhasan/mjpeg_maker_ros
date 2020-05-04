@@ -12,10 +12,11 @@
 
 namespace mjpeg_maker {
 
-ImageWriter::ImageWriter(int _image_width, int _image_height, int _channel)
+ImageWriter::ImageWriter(int _image_width, int _image_height, int _channel, int _downSamplingFactor)
 	: image_width(_image_width)
 	, image_height(_image_height)
 	, channel(_channel)
+	, downSamplingFactor(_downSamplingFactor)
 	, buffer(NULL)
 	, isInitialized(false)
 
@@ -36,6 +37,10 @@ void ImageWriter::SetMaxDataSize(int w, int h, int ch) {
 	max_data_size = w*h*ch+1024;
 }
 
+int ImageWriter::GetDownSamplingFactor() const {
+	return downSamplingFactor;
+}
+
 void ImageWriter::SetMaxDataSize(int w, int h) {
 	SetMaxDataSize(w, h, channel);
 }
@@ -53,8 +58,8 @@ char * ImageWriter::GetBuffer() {
 	return buffer;
 }
 
-int ImageWriter::Write(char * src, int stride, int quality) {
-	return Write(buffer, src, stride, quality);
+int ImageWriter::Write(char * src, int srcLen, int stride, int quality) {
+	return Write(buffer, src, srcLen, stride, quality);
 
 }
 

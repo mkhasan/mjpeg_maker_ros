@@ -9,6 +9,8 @@
 #include <ace/Task.h>
 #include <ace/SOCK_Dgram.h>
 
+//#include "stream_source.h"
+
 #ifndef DWORD
 #define DWORD unsigned int
 #endif
@@ -16,6 +18,7 @@
 
 namespace mjpeg_maker {
 class Client_Handler;
+class StreamSource;
 
 class CStreamer
 {
@@ -34,7 +37,8 @@ public:
 	char *data;
 	int dataLen;
 
-
+private:
+	StreamSource * streamSource;
 
 public:
 
@@ -49,6 +53,7 @@ public:
 
 
     unsigned char GetQualityFactor();
+    void SetStreamerID(int streamID);
 
 
 private:

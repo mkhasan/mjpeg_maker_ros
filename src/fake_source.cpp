@@ -31,6 +31,8 @@ extern "C" {
 }
 #endif
 
+#include "client_interface/client_interface.h"
+
 #include <assert.h>
 
 
@@ -55,7 +57,7 @@ FakeSource::FakeSource(CStreamer * streamer, int streamID)
 	{
 		stringstream ss;
 		ss << "can't create thread :[" << err << "]";
-		THROW(mjpeg_maker::RobotException, ss.str().c_str());
+		THROW(RobotException, ss.str().c_str());
 	}
 
 	printf("FakeSource created \n");
@@ -222,9 +224,10 @@ void * FakeSource::stream_generator(void * arg) {
 					//SaveFrame(pFrameRGB, pCodecCtx->width, pCodecCtx->height,
 						//1, info->streamer->data, (int) info->streamer->GetQualityFactor(), info->writer);
 
-					int data_len = info->writer->Write((char *)pFrameRGB->data[0], pFrameRGB->linesize[0], (int) info->streamer->GetQualityFactor());
+					int data_len = info->writer->Write((char *)pFrameRGB->data[0], pCodecCtx->width*pCodecCtx->height*3, pFrameRGB->linesize[0], (int) info->streamer->GetQualityFactor());
 
-					//printf("data len is %d \n", data_len);
+
+					printf("width %d height %d stride %d: ", pCodecCtx->width, pCodecCtx->height, pFrameRGB->linesize[0]);
 					//int w, h, offset;
 					//JPEG_Writer::GetInfo(info->writer->GetBuffer(), data_len, w, h, offset);
 					//assert(w == pCodecCtx->width && h == pCodecCtx->height);
@@ -268,7 +271,7 @@ void SaveFrame(AVFrame *pFrame, int width, int height, int iFrame, char * data, 
 	  //image_height = height;
 	  //image_width = width;
 	  //write_JPEG_file(data, qualityFactor);
-	  writer->Write(data, (char *)pFrame->data[0], pFrame->linesize[0], qualityFactor);
+	  //writer->Write(data, (char *)pFrame->data[0], pFrame->linesize[0], qualityFactor);
 
   }
 

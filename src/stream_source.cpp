@@ -41,4 +41,16 @@ void StreamSource::SetStreamID(int _streamID) {
 
 }
 
+int StreamSource::GetStreamID() const {
+	return streamID;
+}
+
+CStreamer * StreamSource::GetStreamer() const{
+	return streamer;
+}
+
+ImageWriter * StreamSource::GetWriter() const {
+	return writer;
+}
+
 }

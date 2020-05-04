@@ -25,21 +25,25 @@ protected:
 
 	char * buffer;
 
+	int downSamplingFactor;
+
 	//StreamSource * streamSource;
 
 public:
-	ImageWriter(int image_width=0, int image_heght=0, int channel=3);
+	ImageWriter(int image_width=0, int image_heght=0, int channel=3, int downSampligFactor = 1);
 	virtual ~ImageWriter();
 	virtual void Initialize();
 	virtual void Initialize(int image_width, int image_height)=0;
 	virtual void Finalize()=0;
-	virtual int Write(char * dest, char * src, int stride, int quality)=0;
-	virtual int Write(char *src, int stride, int quality);
+	virtual int Write(char *dest, char * src, int srcLen, int stride, int quality)=0;
+	virtual int Write(char *src, int srcLen, int stride, int quality);
 	void SetMaxDataSize(int w, int h, int ch);
 	void SetMaxDataSize(int w, int h);
 	int GetMaxDataSize() const;
 	void GetDimenstion(int & width, int & height) const;
 	char * GetBuffer();
+
+	int GetDownSamplingFactor() const;
 };
 
 }

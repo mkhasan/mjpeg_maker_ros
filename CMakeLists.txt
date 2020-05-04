@@ -25,6 +25,7 @@ generate_messages(
 include_directories(
   include
   /usr/local/include
+  /usr/local/include/ImageMagick-7
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -36,6 +37,7 @@ find_library(AVFORMAT avformat HINTS $ENV{FFMPEG_ROOT}/libavformat)
 find_library(SWSCALE swscale HINTS $ENV{FFMPEG_ROOT}/libswscale)
 #find_library(AVFILTER avfilter HINTS $ENV{FFMPEG_ROOT}/libavfilter)
 #find_library(AVDEVICE avdevice HINTS $ENV{FFMPEG_ROOT}/libavdevice)
+find_library(MAGIC_HDRI Magick++-7.Q16HDRI HINTS "/usr/local/lib")
 find_library(ACE ACE)
 
 
@@ -49,6 +51,10 @@ set ( MJPEG_MAKER_SRC
 	src/jpeg_writer.cpp
 	src/stream_source.cpp
 	src/fake_source.cpp
+	src/shm_manager.cpp
+	src/camera_view.cpp
+	src/utils.cpp
+	
 )			
 
 add_library(${PROJECT_NAME}
@@ -64,7 +70,7 @@ catkin_package(
 
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
  
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${AVCODEC} ${AVFORMAT} ${AVUTIL} ${SWSCALE} ${JPEG_LIB} ${ACE})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${AVCODEC} ${AVFORMAT} ${AVUTIL} ${SWSCALE} ${JPEG_LIB} ${MAGIC_HDRI} ${ACE})
 
 add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 

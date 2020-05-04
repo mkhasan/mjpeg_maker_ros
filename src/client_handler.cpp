@@ -127,7 +127,7 @@ Client_Handler::svc(void)
 
 
 	//FakeSource streamSource(&Streamer, RtspSession.GetStreamID());
-	StreamSource * fakeSource = new FakeSource(&Streamer, RtspSession.GetStreamID());
+	//StreamSource * fakeSource = new FakeSource(&Streamer, RtspSession.GetStreamID());
 
 
 	bool Stop = false;
@@ -189,7 +189,7 @@ Client_Handler::svc(void)
 	free(b);
 
 
-	delete fakeSource;
+	//delete fakeSource;
 
   return 0;
 }

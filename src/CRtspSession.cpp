@@ -266,6 +266,9 @@ void CRtspSession::Handle_RtspDESCRIBE()
         return;
     };
 
+    m_Streamer->SetStreamerID(m_StreamID);
+
+
     // simulate DESCRIBE server response
     char OBuf[256];
     char * ColonPtr;

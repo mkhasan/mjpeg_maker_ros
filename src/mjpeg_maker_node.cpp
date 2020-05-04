@@ -10,10 +10,12 @@
 
 
 #include "mjpeg_maker/mjpeg_maker.h"
-
 #include "client_interface/shm_manager.h"
-
 #include "mjpeg_maker/client_acceptor.h"
+#include "spectator/get_str.h"
+#include "mjpeg_maker/utils.h"
+#include "mjpeg_maker/shm_manager.h"
+#include "mjpeg_maker/mjpeg_maker.h"
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -27,22 +29,17 @@
 #include <string.h>
 #include <assert.h>
 
-#include <mjpeg_maker/mjpeg_maker.h>
+
 
 using namespace std;
-using namespace client_interface;
+//using namespace client_interface;
+using namespace mjpeg_maker;
 
 
-//extern int quit;
-//extern ACE_Reactor reactor;
-shm_data *pData;
 
-sem_t *mutex;
-sem_t *debugLock;
+pthread_t mjpeg_maker_thread;
 
-pthread_t cam_viewer_thread;
 
-string mutexPrefix;
 
 
 //extern void * mjpeg_maker::main1(void * ptr);
@@ -63,8 +60,8 @@ void mySigintHandler(int sig)
 
 	}
 
-	mjpeg_maker::Finish();
-	pthread_join( cam_viewer_thread, NULL);
+	mjpeg_maker::finish();
+	pthread_join( mjpeg_maker_thread, NULL);
 
 
 
@@ -90,6 +87,7 @@ int main(int argc, char **argv) {
 	ROS_ERROR("MUTEX PREFIX IS %s", mutexPrefix.c_str());
 
 	*/
+	string mutexPrefix = "kict_mp_camera001_";
 
 	if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
 	   ros::console::notifyLoggerLevelsChanged();
@@ -104,12 +102,40 @@ int main(int argc, char **argv) {
 	signal(SIGTSTP, mySigintHandler);
 
 
-	int iret = pthread_create( &cam_viewer_thread, NULL, mjpeg_maker::main1, NULL);
+	ros::ServiceClient shm_observer = nh.serviceClient<spectator::get_str>("client_interface/is_shm_initialized");
+
+	spectator::get_str srv;
+
+	int tryCount=0;
+	for (tryCount=0; tryCount<10; tryCount++) {
+		if (shm_observer.call(srv)) {
+			ROS_INFO("is shm initialiaed %s", srv.response.str.c_str());
+			if (srv.response.str == "true")
+				break;
+		}
+		else {
+			ROS_ERROR("client_interface not found");
+
+
+		}
+
+		ros::Duration(1.0).sleep();
+	}
+
+	if (tryCount == 10) {
+		ROS_ERROR("Shm is not initialized");
+		return 1;
+	}
+
+
+	int iret = pthread_create( &mjpeg_maker_thread, NULL, mjpeg_maker::mjpeg_maker_func, (void *)&mutexPrefix);
     if(iret) {
         ROS_ERROR("Error in creating cam viewer");
         return -1;
     }
 
+
+    ServiceContainer::Instance()->set<ShmManager>();
 	while (ros::ok()) {
 
 

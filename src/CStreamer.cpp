@@ -7,7 +7,11 @@
 #include "mjpeg_maker/client_handler.h"
 
 #include "mjpeg_maker/CStreamer.h"
+#include "mjpeg_maker/camera_view.h"
+#include "mjpeg_maker/fake_source.h"
+#include "client_interface/client_interface.h"
 
+#include "ros/ros.h"
 
 #include <stdio.h>
 
@@ -26,6 +30,7 @@ CStreamer::CStreamer(Client_Handler *_aClientHandler)
 	, dataLen(0)
 	, data(NULL)
 	, streamStarted(0)
+	, streamSource(NULL)
 
 {
     m_RtpServerPort  = 0;
@@ -38,6 +43,8 @@ CStreamer::CStreamer(Client_Handler *_aClientHandler)
     m_SendIdx        = 0;
     m_TCPTransport   = false;
 
+    streamSource = new CameraView(this, -1);
+
     //data = new (nothrow) char[MAX_DATA_SIZE];
 
 
@@ -47,6 +54,8 @@ CStreamer::CStreamer(Client_Handler *_aClientHandler)
 CStreamer::~CStreamer()
 {
 	finished = 1;
+
+	delete streamSource;
 	//this->wait();
     m_RtpSocket.close();
     m_RtcpSocket.close();
@@ -55,8 +64,13 @@ CStreamer::~CStreamer()
 
     // do no allocate or deallocate this data...StreamSource is responsible for that
 
+
     cout << "in destructor " << endl;
 };
+
+void CStreamer::SetStreamerID(int streamID) {
+	streamSource ->SetStreamID(streamID);
+}
 
 unsigned char CStreamer::GetQualityFactor() {
 	return QUALITY_FACTOR;
@@ -258,7 +272,12 @@ char * CStreamer::GetData(int image_length, int & payload_length)
 
 	int k = GetPayLoad(data, image_length, width, height);
 
-	assert(k >= 0);
+	ROS_DEBUG("offset is %d width = %d height = %d", k, width, height);
+
+	if (k < 0) {
+		THROW(RobotException, "Error in getting payload offset");
+	}
+
 	static int first_time = 0;
 	if (first_time)
 	{
