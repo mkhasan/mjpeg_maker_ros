@@ -163,6 +163,7 @@ Client_Handler::svc(void)
 				printf("started .........................................................\n");
 				//streamSource->SetStreamID(RtspSession.GetStreamID());
 
+				Streamer.SetStreamerID(RtspSession.GetStreamID());
 				Streamer.streamStarted = 1;
 
 			}

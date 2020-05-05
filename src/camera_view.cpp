@@ -81,7 +81,7 @@ void * CameraView::stream_generator(void * arg) {
 	}
 
 	const int SIZE = ShmManager::IMAGE_WIDTH*ShmManager::IMAGE_HEIGHT*3;
-	static char buffer[SIZE+1024];
+	char * buffer = new char[SIZE+1024];
 	while((info->source->GetStreamer()->finished == 0) && *(info->quit) == false) {
 
 		int streamID = info->source->GetStreamID();
@@ -134,6 +134,7 @@ void * CameraView::stream_generator(void * arg) {
 
 	}
 
+	delete buffer;
 	*(info->quit) = true;
 
 	return NULL;

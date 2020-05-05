@@ -48,7 +48,7 @@ class JPEG_Writer : public ImageWriter {
 
 	std::unique_ptr<Magick::Blob> jpegBlob;
 
-
+	char * temp;
 public:
 
 	JPEG_Writer(int image_width, int image_height, int channel=3, int downSamplingFactor = 1);

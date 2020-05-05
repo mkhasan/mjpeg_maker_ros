@@ -1,0 +1,4 @@
+<launch>
+	<rosparam file="$(find client_interface)/config/configuration.yaml" command="load"/>
+    <node name="mjpeg_maker_node" pkg="mjpeg_maker" type="mjpeg_maker_node" output="screen" />
+</launch>

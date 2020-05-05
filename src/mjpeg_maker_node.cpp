@@ -87,12 +87,14 @@ int main(int argc, char **argv) {
 	ROS_ERROR("MUTEX PREFIX IS %s", mutexPrefix.c_str());
 
 	*/
-	string mutexPrefix = "kict_mp_camera001_";
 
-	if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
+
+	if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info) ) {
 	   ros::console::notifyLoggerLevelsChanged();
 	}
 
+	string mutexPrefix;
+	nh.param("/ROBOT/MUTEX_PREFIX", mutexPrefix, string("kict_mp_camera00_"));
 
 
 	signal(SIGTERM, mySigintHandler);

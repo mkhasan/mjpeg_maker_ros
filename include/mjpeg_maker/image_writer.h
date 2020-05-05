@@ -25,6 +25,7 @@ protected:
 
 	char * buffer;
 
+
 	int downSamplingFactor;
 
 	//StreamSource * streamSource;

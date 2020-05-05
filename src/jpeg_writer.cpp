@@ -139,7 +139,7 @@ JPEG_Writer::write_JPEG_file(unsigned char * dest, unsigned char * src, int stri
 
 
 JPEG_Writer::JPEG_Writer(int _image_width, int _image_height, int _channel, int _downSamplingFactor)
-	: ImageWriter(_image_width, _image_height, _channel, _downSamplingFactor)
+	: ImageWriter(_image_width, _image_height, _channel, _downSamplingFactor), temp(NULL)
 
 {
 
@@ -175,6 +175,7 @@ void JPEG_Writer::Initialize(int _image_width, int _image_height) {
 
 	init_JPEG();
 	buffer = new char[GetMaxDataSize()];
+	temp = new char[GetMaxDataSize()];
 
 	jpegBlob = std::make_unique<Blob>();
 
@@ -189,6 +190,7 @@ void JPEG_Writer::Finalize() {
 
 	finalize_JPEG();
 	delete[] buffer;
+	delete[] temp;
 
 	jpegBlob.reset();
 	isInitialized = false;
@@ -225,14 +227,14 @@ int JPEG_Writer::Write(char * dest, char * src, int srcLen, int stride, int qual
 
 		ROS_DEBUG("trimmed width is %d", w);
 
-		static char buf[ShmManager::IMAGE_WIDTH*ShmManager::IMAGE_HEIGHT*3];
-		image.write(8, 0, w, ShmManager::IMAGE_HEIGHT/downSamplingFactor, "RGB", Magick::CharPixel, (void *)buf);
+		//static char buf[ShmManager::IMAGE_WIDTH*ShmManager::IMAGE_HEIGHT*3];
+		image.write(8, 0, w, ShmManager::IMAGE_HEIGHT/downSamplingFactor, "RGB", Magick::CharPixel, (void *)temp);
 
 
-		int len = write_JPEG_file((unsigned char *) dest, (unsigned char *) buf, w*3, 0x5e);//jpegBlob->length();
+		int len = write_JPEG_file((unsigned char *) dest, (unsigned char *) temp, w*3, 0x5e);//jpegBlob->length();
 		//memcpy(dest, jpegBlob->data(), len);
 
-		if (first) {
+		if (first && 0) {
 			//image.write("test3.jpg");
 			ofstream wf("out.jpg", ios::out | ios::binary);
 			wf.write(dest, len);
